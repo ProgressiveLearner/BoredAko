@@ -20,7 +20,7 @@ body {
 
 #container-wrapper {
     position: relative;
-    width: clamp(300px, 95vw, 1160px); /* Responsive width */
+    width: clamp(280px, 98vw, 1160px); /* Adjusted min-width and vw */
     height: auto; /* Adjusted by JS based on grid height */
     display: flex;
     background: rgba(255, 255, 255, 0.15);
@@ -53,12 +53,12 @@ body {
 
 #love-title {
     position: absolute;
-    top: 40px;
+    top: clamp(15px, 4vw, 40px); /* Adjusted min top */
     left: 0;
     width: 100%;
     text-align: center;
     color: white;
-    font-size: clamp(28px, 6vw, 42px); /* Responsive font size */
+    font-size: clamp(20px, 6vw, 42px); /* Adjusted min font size */
     font-family: 'Playfair Display', serif;
     font-weight: 700;
     z-index: 5;
@@ -68,12 +68,12 @@ body {
 
 #subtitle {
     position: absolute;
-    top: 90px;
+    top: clamp(40px, 9vw, 90px); /* Adjusted min top */
     left: 0;
     width: 100%;
     text-align: center;
     color: rgba(255, 255, 255, 0.95);
-    font-size: clamp(16px, 3vw, 20px); /* Responsive font size */
+    font-size: clamp(12px, 3vw, 20px); /* Adjusted min font size */
     font-weight: 400;
     font-style: italic;
     z-index: 5;
@@ -165,18 +165,18 @@ body {
 }
 
 #joystick-container {
-    width: 120px; /* Fixed size for touch target */
-    height: 120px; /* Fixed size for touch target */
+    width: clamp(70px, 20vw, 100px); /* Adjusted for smaller min size */
+    height: clamp(70px, 20vw, 100px); /* Adjusted for smaller min size */
     position: relative;
     filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
 }
 
 #heart-base {
     position: absolute;
-    width: 100px;
-    height: 100px;
-    top: 10px;
-    left: 10px;
+    width: 100%; /* Changed to % to scale with container */
+    height: 100%; /* Changed to % to scale with container */
+    top: 0; /* Adjusted to 0 for full container use */
+    left: 0; /* Adjusted to 0 for full container use */
 }
 
 #base-heart {
@@ -189,10 +189,10 @@ body {
 
 #joystick-handle {
     position: absolute;
-    width: 50px;
-    height: 50px;
-    top: 60px;
-    left: 60px;
+    width: 50%; /* Changed to % to scale with container */
+    height: 50%; /* Changed to % to scale with container */
+    top: 50%; /* Keep centered */
+    left: 50%; /* Keep centered */
     transform: translate(-50%, -50%);
     z-index: 1;
     pointer-events: none;
@@ -211,7 +211,7 @@ body {
     width: 100%;
     text-align: center;
     color: white;
-    font-size: clamp(24px, 5vw, 48px); /* Responsive font size */
+    font-size: clamp(18px, 5vw, 48px); /* Adjusted min font size */
     font-family: 'Playfair Display', serif;
     font-weight: 700;
     opacity: 0;
@@ -219,22 +219,22 @@ body {
     transition: opacity 1.2s ease;
     z-index: 20;
     pointer-events: none;
-    padding: 0 clamp(20px, 10vw, 60px); /* Responsive padding */
+    padding: 0 clamp(8px, 4vw, 60px); /* Adjusted min padding */
     line-height: 1.4;
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
 }
 
 #restart {
     position: absolute;
-    bottom: clamp(15px, 5vw, 40px); /* Responsive bottom position */
-    right: clamp(15px, 5vw, 40px); /* Responsive right position */
-    padding: clamp(10px, 3vw, 18px) clamp(20px, 6vw, 36px); /* Responsive padding */
+    bottom: clamp(8px, 3vw, 40px); /* Adjusted min bottom */
+    right: clamp(8px, 3vw, 40px); /* Adjusted min right */
+    padding: clamp(6px, 2vw, 18px) clamp(12px, 4vw, 36px); /* Adjusted min padding */
     background: rgba(232, 67, 147, 0.95);
     color: white;
     border: none;
     border-radius: 35px;
     font-family: 'Montserrat', sans-serif;
-    font-size: clamp(16px, 3.5vw, 20px); /* Responsive font size */
+    font-size: clamp(12px, 2.8vw, 20px); /* Adjusted min font size */
     font-weight: 600;
     cursor: pointer;
     box-shadow: 0 8px 25px rgba(232, 67, 147, 0.6);
@@ -261,26 +261,26 @@ body {
     #game-area {
         width: 100%;
         height: auto; /* Will be set by JS dynamically */
-        min-height: 300px; /* A minimum height for the game area */
+        min-height: clamp(150px, 50vh, 300px); /* Adjusted min height */
     }
 
     #control-panel {
         width: 100%; /* Take full width */
-        height: 180px; /* Fixed height for mobile joystick area */
+        height: clamp(100px, 20vh, 150px); /* Adjusted min height */
         order: 1; /* Place control panel below game area */
     }
 
     #love-title {
-        top: 20px; /* Adjust top position for smaller screens */
+        top: 10px; /* Further adjusted top position for smaller screens */
     }
 
     #subtitle {
-        top: 60px; /* Adjust top position for smaller screens */
+        top: 40px; /* Further adjusted top position for smaller screens */
     }
 
     #restart {
         position: static; /* Remove absolute positioning */
-        margin-top: 20px; /* Add some space from game area */
+        margin-top: clamp(8px, 2.5vw, 20px); /* Adjusted margin top */
         transform: none; /* Remove hover transform for mobile */
         box-shadow: none; /* Remove hover shadow for mobile */
         width: 80%; /* Make button wider */
@@ -294,6 +294,6 @@ body {
 
     /* Adjust joystick container margin to center it more on small screens */
     #joystick-container {
-        margin-top: 20px;
+        margin-top: clamp(8px, 2.5vw, 20px); /* Adjusted margin top */
     }
 }
