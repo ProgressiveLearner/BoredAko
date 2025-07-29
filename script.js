@@ -1,6 +1,6 @@
 // Game constants
-const GRID_WIDTH = 20;
-const GRID_HEIGHT = 12;
+const GRID_WIDTH = 15; // Adjusted for smaller, more navigable maze on mobile
+const GRID_HEIGHT = 9;  // Adjusted for smaller, more navigable maze on mobile
 let CELL_SIZE; // This will now be dynamic
 
 // Game elements
@@ -28,8 +28,8 @@ let currentMoveY = 0;
 
 // Joystick state
 let isJoystickActive = false;
-const joystickCenterX = 60;
-const joystickCenterY = 60;
+// joystickCenterX/Y now refer to the _relative_ center within the joystick-container's bounds
+// Since the joystick-container scales, we'll calculate its center dynamically in updateJoystickPosition
 const playerMovementMaxDistance = 40; // Max distance for player's full speed
 const movementDeadZone = 10; // Pixels from center before player starts moving
 const maxVisualHandleDistance = 70; // Max distance for the visual handle to move
@@ -354,8 +354,9 @@ function updatePlayerPosition() {
 
 function updateJoystickPosition(pointerX, pointerY) {
     const joystickRect = joystickHandle.parentElement.getBoundingClientRect();
-    const containerX = joystickRect.left + joystickCenterX;
-    const containerY = joystickRect.top + joystickCenterY;
+    // Calculate the center of the joystick container dynamically
+    const containerX = joystickRect.left + (joystickRect.width / 2);
+    const containerY = joystickRect.top + (joystickRect.height / 2);
 
     let dx = pointerX - containerX;
     let dy = pointerY - containerY;
@@ -366,8 +367,8 @@ function updateJoystickPosition(pointerX, pointerY) {
 
     // Clamp handle's visual distance to maxVisualHandleDistance
     let visualDistance = Math.min(distance, maxVisualHandleDistance);
-    let visualHandleX = joystickCenterX + Math.cos(angle) * visualDistance;
-    let visualHandleY = joystickCenterY + Math.sin(angle) * visualDistance;
+    let visualHandleX = (joystickRect.width / 2) + Math.cos(angle) * visualDistance; // Position relative to its parent
+    let visualHandleY = (joystickRect.height / 2) + Math.sin(angle) * visualDistance; // Position relative to its parent
 
     joystickHandle.style.left = visualHandleX + 'px';
     joystickHandle.style.top = visualHandleY + 'px';
@@ -387,8 +388,9 @@ function updateJoystickPosition(pointerX, pointerY) {
 
 
 function resetJoystick() {
-    joystickHandle.style.left = joystickCenterX + 'px';
-    joystickHandle.style.top = joystickCenterY + 'px';
+    // Reset to the center of its parent (50% 50% transformed by -50% -50% results in center)
+    joystickHandle.style.left = '50%';
+    joystickHandle.style.top = '50%';
     currentMoveX = 0;
     currentMoveY = 0;
 }
