@@ -1,7 +1,7 @@
 // Game constants
 const GRID_WIDTH = 20;
 const GRID_HEIGHT = 12;
-const CELL_SIZE = 50;
+let CELL_SIZE; // This will now be dynamic
 
 // Game elements
 const maze = document.getElementById('maze');
@@ -10,44 +10,78 @@ const goal = document.getElementById('goal');
 const joystickHandle = document.getElementById('joystick-handle');
 const message = document.getElementById('message');
 const restartBtn = document.getElementById('restart');
-const loveTitle = document.getElementById('love-title'); // NEW
-const subtitle = document.getElementById('subtitle');   // NEW
+const loveTitle = document.getElementById('love-title');
+const subtitle = document.getElementById('subtitle');
+const gameArea = document.getElementById('game-area'); // Get gameArea element here
 
 // Game settings
 const playerSpeed = 4; // This will now be the MAX speed
-const PLAYER_COLLISION_RADIUS = 12; // For chibi character
-const GOAL_RADIUS = 20; // For 40px love letter (40/2)
+let PLAYER_COLLISION_RADIUS; // Will be calculated dynamically
+let GOAL_RADIUS; // Will be calculated dynamically
 const WALL_THICKNESS = 4; // Used for wall generation
 
 let playerX, playerY;
 let goalX, goalY;
 let walls = [];
-let currentMoveX = 0; // Renamed to clarify it's the player's current intended movement
-let currentMoveY = 0; // Renamed to clarify it's the player's current intended movement
+let currentMoveX = 0;
+let currentMoveY = 0;
 
 // Joystick state
 let isJoystickActive = false;
 const joystickCenterX = 60;
 const joystickCenterY = 60;
-const playerMovementMaxDistance = 40; // Max distance for player's full speed (formerly maxHandleDistance)
+const playerMovementMaxDistance = 40; // Max distance for player's full speed
 const movementDeadZone = 10; // Pixels from center before player starts moving
-// NEW: Max distance for the visual handle to move (allowing "stretch")
-const maxVisualHandleDistance = 70; // Set this higher than playerMovementMaxDistance
+const maxVisualHandleDistance = 70; // Max distance for the visual handle to move
 
 // Maze grid
 let grid = [];
 
-// Create the game on load
+// Create the game on load and handle resize
 window.onload = function() {
+    // Initial setup
+    setupGameAreaAndContainer();
+    startGame();
+
+    // Listen for resize events to re-adjust CELL_SIZE and re-draw maze if needed
+    // Using a debounced resize listener for performance
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            setupGameAreaAndContainer();
+            // Re-generate maze and restart game to adapt to new cell size
+            startGame();
+        }, 200); // Debounce to prevent excessive calls
+    });
+};
+
+function setupGameAreaAndContainer() {
+    // Calculate dynamic CELL_SIZE based on current gameArea width
+    CELL_SIZE = Math.floor(gameArea.offsetWidth / GRID_WIDTH); // Ensure integer for pixel perfect walls
+
     // Adjust game-area height to match grid height
-    const gameArea = document.getElementById('game-area');
     gameArea.style.height = (GRID_HEIGHT * CELL_SIZE) + 'px';
 
     const containerWrapper = document.getElementById('container-wrapper');
-    containerWrapper.style.height = (GRID_HEIGHT * CELL_SIZE) + 'px'; // Ensure wrapper matches game-area height
+    // For mobile, the height might be auto with flex-direction column, so only set if not auto
+    if (window.innerWidth > 768) { // Only set fixed height on larger screens
+        containerWrapper.style.height = (GRID_HEIGHT * CELL_SIZE) + 'px';
+    } else {
+        containerWrapper.style.height = 'auto'; // Let CSS media query manage height
+    }
 
-    startGame();
-};
+    // Adjust collision radii based on the new CELL_SIZE
+    PLAYER_COLLISION_RADIUS = (0.3 * CELL_SIZE); // Roughly 30% of cell size
+    GOAL_RADIUS = (0.4 * CELL_SIZE); // Roughly 40% of cell size
+
+    // Adjust player and goal size based on CELL_SIZE
+    player.style.width = CELL_SIZE + 'px';
+    player.style.height = CELL_SIZE + 'px';
+    goal.style.width = CELL_SIZE + 'px';
+    goal.style.height = CELL_SIZE + 'px';
+}
+
 
 function initializeGrid() {
     grid = [];
@@ -122,7 +156,7 @@ function generateMaze() {
     }
 
     // Add walls to the DOM
-    // Outer walls
+    // Outer walls (using CELL_SIZE * GRID_WIDTH/HEIGHT)
     addWall(0, 0, CELL_SIZE * GRID_WIDTH, WALL_THICKNESS);
     addWall(CELL_SIZE * GRID_WIDTH - WALL_THICKNESS, 0, WALL_THICKNESS, CELL_SIZE * GRID_HEIGHT);
     addWall(0, CELL_SIZE * GRID_HEIGHT - WALL_THICKNESS, CELL_SIZE * GRID_WIDTH, WALL_THICKNESS);
@@ -222,8 +256,9 @@ function createFloatingHearts() {
     for (let i = 0; i < numberOfHearts; i++) {
         const heart = document.createElement('div');
         heart.className = 'floating-heart';
-        heart.style.left = Math.random() * maze.offsetWidth + 'px';
-        heart.style.top = maze.offsetHeight + Math.random() * 100 + 'px'; // Start below the maze
+        // Use gameArea.offsetWidth for responsive positioning
+        heart.style.left = Math.random() * gameArea.offsetWidth + 'px';
+        heart.style.top = gameArea.offsetHeight + Math.random() * 100 + 'px'; // Start below the maze
         heart.style.animationDelay = `${Math.random() * 5}s`;
         heart.style.opacity = Math.random() * 0.5 + 0.3;
         heart.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
@@ -414,6 +449,9 @@ function startGame() {
 
     let attempts = 0;
     const MAX_ATTEMPTS = 100;
+
+    // Ensure CELL_SIZE and other responsive elements are set before maze generation
+    setupGameAreaAndContainer();
 
     do {
         initializeGrid();
